@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { PageHeading } from "@/components/page-heading";
-import { ClubImage } from "@/components/club-image";
+import { ClubImage, ProjectPlaceholder } from "@/components/club-image";
 import { publishedProjects } from "@/lib/showcase";
 
 export const metadata = { title: "Projects" };
@@ -11,7 +11,7 @@ export default async function Projects() {
       <PageHeading
         section="Projects"
         title="Projects"
-        description="Hardware builds from the club’s workbench, from signal processing to motion control."
+        description="Hardware built by club members, from FPGA video pipelines and analog control loops to robots and VLSI chip design."
       />
       {projects === null ? (
         <p className="events-status" role="status">Projects are temporarily unavailable.</p>
@@ -25,7 +25,7 @@ export default async function Projects() {
                 {p.image ? (
                   <ClubImage src={p.image} width={720} height={478} alt={`Photo of the ${p.title.toLowerCase()} project`} priority={i < 3} />
                 ) : (
-                  <span className="portrait-initials" aria-hidden="true">{p.title.slice(0, 2).toUpperCase()}</span>
+                  <ProjectPlaceholder category={p.category} title={p.title} />
                 )}
               </div>
               <div className="catalog-copy">

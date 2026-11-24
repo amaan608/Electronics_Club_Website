@@ -583,11 +583,14 @@ test("member authentication", { timeout: 1_800_000 }, async (t) => {
   await t.test("team and projects come from the database with Cloudinary images",async()=>{
     const {admin,memberCookie}=shared;
     assert.equal(await db.collection("team_members").countDocuments(),11,"The 2026–27 heads are seeded once");
-    assert.equal(await db.collection("projects").countDocuments(),3);
+    assert.equal(await db.collection("projects").countDocuments(),6,"The brochure projects are seeded");
+    assert.equal(await db.collection("projects").countDocuments({slug:{$in:["signal-display","battery-monitor","desktop-plotter"]}}),0,"Demo projects are gone");
     const team=await(await fetch(url+"/team")).text();
     assert.ok(team.includes("Mourya")&&team.includes("Signal Processing Head")&&team.includes("Princy"));
-    assert.ok((await(await fetch(url+"/projects")).text()).includes("Signal display"));
-    assert.equal((await fetch(url+"/projects/battery-monitor")).status,200);
+    assert.ok((await(await fetch(url+"/projects")).text()).includes("Synaptron"));
+    const lena=await fetch(url+"/projects/lena");
+    assert.equal(lena.status,200);
+    const lenaPage=await lena.text();assert.ok(lenaPage.includes("PHOTO COMING SOON")&&lenaPage.includes("Result: live, artifact-free"));
 
     const photo="https://res.cloudinary.com/club-demo/image/upload/v1712345678/team/rhea.jpg";
     const person={name:"Rhea",role:"Robotics Head",bio:"Builds things that move.",image:photo,order:"20",published:true,tenure:"2026–27"};
@@ -614,6 +617,15 @@ test("member authentication", { timeout: 1_800_000 }, async (t) => {
     assert.equal(page.status,200);assert.ok((await page.text()).includes("c_fill,g_auto,w_720,h_478"));
     assert.equal((await admin("projects/"+(await made.json()).id,{intent:"delete"})).status,200);
     assert.equal((await fetch(url+"/projects/line-follower")).status,404);
+    const group="https://res.cloudinary.com/club-demo/image/upload/v1/team/group.jpg";
+    assert.equal((await admin("settings/team",{groupPhoto:group,groupCaption:"Heads 2026–27"},memberCookie)).status,403);
+    assert.equal((await admin("settings/team",{groupPhoto:"https://example.com/group.jpg"})).status,400);
+    assert.equal((await admin("settings/team",{groupPhoto:group,groupCaption:"Heads 2026–27"})).status,200);
+    const withGroup=await(await fetch(url+"/team")).text();
+    assert.ok(withGroup.includes("c_limit,w_1600,h_900,f_auto,q_auto/v1/team/group.jpg")&&withGroup.includes("Heads 2026–27"));
+    assert.equal((await admin("settings/team",{groupPhoto:"",groupCaption:""})).status,200);
+    assert.equal((await db.collection("site_settings").findOne({_id:"team"})).groupPhoto,undefined);
+    assert.ok(!(await(await fetch(url+"/team")).text()).includes("group-photo"),"Clearing the URL hides the photo");
     for(const p of ["/team","/projects"])
       assert.equal((await fetch(url+"/admin"+p,{headers:{cookie:shared.adminCookie}})).status,200);
   });

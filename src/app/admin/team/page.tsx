@@ -1,5 +1,5 @@
 import { requireAdminPage } from "@/lib/admin";
-import { TeamMember } from "@/lib/community-models";
+import { SiteSettings, TeamMember } from "@/lib/community-models";
 import { AdminHeading } from "@/components/admin/admin-heading";
 import { AdminForm } from "@/components/admin/admin-form";
 import { ClubImage, initials } from "@/components/club-image";
@@ -31,10 +31,33 @@ function Fields({ member = {} }: { member?: Values }) {
 }
 export default async function TeamAdmin() {
   await requireAdminPage("/admin/team");
-  const team = await TeamMember.find().sort({ order: 1, createdAt: 1 }).lean();
+  const [team, settings] = await Promise.all([
+    TeamMember.find().sort({ order: 1, createdAt: 1 }).lean(),
+    SiteSettings.findById("team").lean(),
+  ]);
   return (
     <>
       <AdminHeading title="Team" description="Members appear on the Team page in display order, lowest first." />
+      <section className="surface admin-section">
+        <h2>Group photo</h2>
+        <p className="form-hint">Shown across the top of the Team page, above the member cards. The whole photo stays in frame.</p>
+        {settings?.groupPhoto && (
+          <div className="group-preview">
+            <ClubImage src={settings.groupPhoto} alt="Current group photo" width={480} height={270} crop="c_limit" />
+          </div>
+        )}
+        <AdminForm endpoint="/api/admin/settings/team" submitLabel="Save group photo" successMessage="Group photo saved.">
+          <label className="field">
+            Group photo URL (Cloudinary)
+            <input name="groupPhoto" maxLength={500} defaultValue={settings?.groupPhoto ?? ""} placeholder="https://res.cloudinary.com/your-cloud/image/upload/v1/team/group.jpg" />
+          </label>
+          <label className="field">
+            Caption
+            <input name="groupCaption" maxLength={120} defaultValue={settings?.groupCaption ?? "The Electronics Club heads, 2026–27"} />
+          </label>
+          <p className="form-hint">Leave the URL empty and save to hide the photo.</p>
+        </AdminForm>
+      </section>
       <section className="surface admin-section">
         <h2>Add a team member</h2>
         <AdminForm endpoint="/api/admin/team" submitLabel="Add member" successMessage="Member added." reset>

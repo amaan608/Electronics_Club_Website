@@ -75,7 +75,7 @@ The admin panel is part of the website at `/admin`, so it deploys to Vercel with
 
 ### Team, projects and Cloudinary photos
 
-The 2026–27 heads (from the club's "Meet the Heads" post) and three starter projects are added to the database on first connection. A marker in the `seed_markers` collection stops them from being added again, so deleted entries stay deleted.
+The 2026–27 heads (from the club's "Meet the Heads" post) and the six club projects from the 2026 brochure are added to the database on first connection (replacing the earlier demo projects). A marker in the `seed_markers` collection stops them from being added again, so deleted entries stay deleted.
 
 To add a photo, upload it to Cloudinary, open the asset, and copy its delivery URL, such as `https://res.cloudinary.com/<cloud>/image/upload/v1712/team/mourya.jpg`. Paste it into the member's or project's image field in the admin panel. The site adds format, quality and face-aware crop settings to the URL, so the original can be any size. Only `res.cloudinary.com` image URLs (and the bundled `/art/` images) are accepted. No Cloudinary API keys are needed. Members without a photo show their initials.
 

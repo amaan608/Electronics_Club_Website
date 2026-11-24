@@ -1,6 +1,7 @@
 import { PageHeading } from "@/components/page-heading";
 import { ClubImage, initials } from "@/components/club-image";
-import { publishedTeam } from "@/lib/showcase";
+import { CornerMarks } from "@/components/mark";
+import { publishedTeam, teamPageSettings } from "@/lib/showcase";
 
 export const metadata = { title: "Team" };
 type Member = Awaited<ReturnType<typeof publishedTeam>>[number];
@@ -24,7 +25,11 @@ function MemberCard({ member, priority }: { member: Member; priority: boolean })
   );
 }
 export default async function Team() {
-  const team = await publishedTeam().catch(() => null);
+  const [team, settings] = await Promise.all([
+    publishedTeam().catch(() => null),
+    teamPageSettings().catch(() => null),
+  ]);
+  const caption = settings?.groupCaption || "The Electronics Club team";
   // Word joiners keep "2026–27" on one line.
   const tenure = team?.find((m) => m.tenure)?.tenure?.replace(/[–-]/g, "⁠–⁠");
   return (
@@ -34,6 +39,14 @@ export default async function Team() {
         title="Our team"
         description={`The heads who run the club’s workshops, projects and events${tenure ? ` for the ${tenure} tenure` : ""}.`}
       />
+      {settings?.groupPhoto && (
+        <figure className="group-photo">
+          <CornerMarks />
+          {/* c_limit keeps the whole group in frame; Cloudinary only scales it down. */}
+          <ClubImage src={settings.groupPhoto} alt={caption} width={1600} height={900} crop="c_limit" priority />
+          <figcaption>{caption}</figcaption>
+        </figure>
+      )}
       {team === null ? (
         <p className="events-status" role="status">The team list is temporarily unavailable.</p>
       ) : team.length ? (

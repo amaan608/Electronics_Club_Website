@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { setting } from "./config";
 import { User, Account, Challenge, RateBucket, GoogleEnrollment } from "./models";
 import { Announcement, MemberQuery, ClubEvent, EventRegistration, TeamMember, Project } from "./community-models";
-import { starterProjects, team2026 } from "./seed-data";
+import { brochureProjects, demoProjectSlugs, team2026 } from "./seed-data";
 
 // Runs a seed once per database. The marker insert is atomic, so concurrent servers cannot both seed.
 async function seedOnce(db: NonNullable<typeof mongoose.connection.db>, id: string, insert: () => Promise<unknown>) {
@@ -56,8 +56,15 @@ async function connect() {
   // Team and projects start from the seed data; deleting entries later does not bring them back.
   await Promise.all([
     seedOnce(db, "team-2026-27", () => TeamMember.insertMany(team2026)),
-    seedOnce(db, "starter-projects", async () => {
-      if (!(await Project.estimatedDocumentCount())) await Project.insertMany(starterProjects);
+    // Replaces the old demo projects with the club's real ones. Projects added in the admin panel are kept,
+    // and a slug that already exists is left as it is.
+    seedOnce(db, "brochure-projects-2026", async () => {
+      await Project.deleteMany({ slug: { $in: demoProjectSlugs } });
+      await Project.bulkWrite(
+        brochureProjects.map((project) => ({
+          updateOne: { filter: { slug: project.slug }, update: { $setOnInsert: project }, upsert: true },
+        })),
+      );
     }),
   ]);
   return mongoose.connection;

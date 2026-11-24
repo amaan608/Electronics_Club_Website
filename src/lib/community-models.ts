@@ -99,3 +99,12 @@ export const TeamMember: Model<InferSchemaType<typeof teamSchema>> =
   mongoose.models.TeamMember ?? mongoose.model("TeamMember", teamSchema);
 export const Project: Model<InferSchemaType<typeof projectSchema>> =
   mongoose.models.Project ?? mongoose.model("Project", projectSchema);
+
+// Page-level settings edited in the admin panel, one document per page (e.g. _id "team").
+const settingsSchema = new Schema({
+  _id:{type:String, required:true},
+  groupPhoto:{type:String, trim:true, maxlength:500, match:imageUrl},
+  groupCaption:{type:String, trim:true, maxlength:120},
+}, {timestamps:true, collection:"site_settings"});
+export const SiteSettings: Model<InferSchemaType<typeof settingsSchema>> =
+  mongoose.models.SiteSettings ?? mongoose.model("SiteSettings", settingsSchema);

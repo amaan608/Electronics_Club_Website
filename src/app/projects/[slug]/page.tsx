@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ClubImage } from "@/components/club-image";
+import { ClubImage, ProjectPlaceholder } from "@/components/club-image";
 import { eventSlug } from "@/lib/community-models";
 import { publishedProject } from "@/lib/showcase";
 
@@ -28,11 +28,13 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           <h1 className="display">{p.title}</h1>
           <p className="lede">{p.description}</p>
         </div>
-        {p.image && (
-          <div className="project-image">
+        <div className="project-image">
+          {p.image ? (
             <ClubImage src={p.image} alt={`Photo of the ${p.title.toLowerCase()} project`} width={720} height={478} priority />
-          </div>
-        )}
+          ) : (
+            <ProjectPlaceholder category={p.category} title={p.title} />
+          )}
+        </div>
       </div>
       {(p.detail || p.hardware || p.stage) && <>
         <h2 className="block-title">Build notes</h2>

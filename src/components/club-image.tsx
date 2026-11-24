@@ -42,6 +42,17 @@ export function ClubImage({
   );
 }
 
+// Shown until a project has a photo: its domain in dot-matrix type, e.g. "DIGITAL".
+export function ProjectPlaceholder({ category, title }: { category?: string | null; title: string }) {
+  const word = (category || title).split(/[·,/]/)[0].trim().split(" ")[0].toUpperCase();
+  return (
+    <span className="project-placeholder" aria-hidden="true">
+      <b>{word}</b>
+      <small>PHOTO COMING SOON</small>
+    </span>
+  );
+}
+
 export function initials(name: string) {
   const parts = name.trim().split(/\s+/);
   return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? parts[parts.length - 1][0] : parts[0]?.[1] ?? "")).toUpperCase();

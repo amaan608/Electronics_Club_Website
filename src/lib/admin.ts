@@ -92,8 +92,8 @@ export function isDuplicate(error: unknown) {
 }
 
 // Cloudinary delivery URLs, e.g. https://res.cloudinary.com/<cloud>/image/upload/v1712/team/mourya.jpg
-function imageField(data: Record<string, unknown>) {
-  const value = typeof data.image === "string" ? data.image.trim() : "";
+function imageField(data: Record<string, unknown>, name = "image") {
+  const value = typeof data[name] === "string" ? (data[name] as string).trim() : "";
   if (!value) return "";
   if (value.length > 500 || !imageUrl.test(value))
     throw new InputError("Paste a Cloudinary image URL that starts with https://res.cloudinary.com/ and contains /image/upload/.");
@@ -143,4 +143,11 @@ export function splitUpdate(input: Record<string, unknown>) {
     else set[key] = value;
   }
   return { $set: set, ...(Object.keys(unset).length ? { $unset: unset } : {}) };
+}
+
+export function teamSettingsInput(data: Record<string, unknown>) {
+  return {
+    groupPhoto: imageField(data, "groupPhoto"),
+    groupCaption: field(data, "groupCaption", "a caption", 120, false),
+  };
 }

@@ -1,6 +1,6 @@
 import "server-only";
 import { database } from "./db";
-import { Project, TeamMember } from "./community-models";
+import { Project, SiteSettings, TeamMember } from "./community-models";
 
 // Public reads for the team and projects pages. Without a database they render empty states.
 export async function publishedTeam() {
@@ -17,4 +17,9 @@ export async function publishedProject(slug: string) {
   if (!process.env.MONGODB_URI) return null;
   await database();
   return Project.findOne({ slug, published: true }).lean();
+}
+export async function teamPageSettings() {
+  if (!process.env.MONGODB_URI) return null;
+  await database();
+  return SiteSettings.findById("team").select("groupPhoto groupCaption").lean();
 }
