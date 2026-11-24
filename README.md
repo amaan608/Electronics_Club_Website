@@ -4,7 +4,7 @@ A Next.js App Router application for the club’s public pages and member authen
 
 ## Run locally
 
-Use Node.js 22.12 or later and npm. From the project directory on Windows, run:
+Use Node.js 26 (the version the site runs on Vercel) and npm. From the project directory on Windows, run:
 
 ```powershell
 npm ci
@@ -28,7 +28,7 @@ https://your-club-domain.example/api/auth/callback/google
 
 ## Vercel
 
-Import the repository as a Next.js project, select the project directory as the root and use Node.js 22.x. Keep the default Next.js output configuration and the `npm run build` build command. Add every variable from `.env.example` to Project Settings → Environment Variables. Set `BETTER_AUTH_URL` to the final HTTPS origin and configure the same host in Google’s OAuth client. Deploy after saving these values. Use separate credentials and a stable, registered callback domain for authenticated preview deployments. A new deployment picks up changed variables. [Vercel environment variables](https://vercel.com/docs/environment-variables) · [Next.js integration](https://better-auth.com/docs/integrations/next)
+Import the repository as a Next.js project, select the project directory as the root and use Node.js 26.x (pinned in `package.json`). Keep the default Next.js output configuration and the `npm run build` build command. Add every variable from `.env.example` to Project Settings → Environment Variables. Set `BETTER_AUTH_URL` to the final HTTPS origin and configure the same host in Google’s OAuth client. Deploy after saving these values. Use separate credentials and a stable, registered callback domain for authenticated preview deployments. A new deployment picks up changed variables. [Vercel environment variables](https://vercel.com/docs/environment-variables) · [Next.js integration](https://better-auth.com/docs/integrations/next)
 
 On the deployed domain, register with an inbox you control, verify its code, sign in, then recover the password and confirm that the previous session expires. Complete Google consent using an authorized test account, and confirm the return to `/account`.
 
